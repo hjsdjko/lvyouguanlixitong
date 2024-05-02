@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.TaocanaDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.taocana_name as taocanaName
+        ,a.taocana_types as taocanaTypes
+        ,a.taocana_money as taocanaMoney
+        ,a.taocana_photo as taocanaPhoto
+        ,a.taocana_content as taocanaContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.TaocanaView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM taocana  a
+
+        <where>
+            <if test=" params.taocanaName != '' and params.taocanaName != null and params.taocanaName != 'null' ">
+                and a.taocana_name like CONCAT('%',#{params.taocanaName},'%')
+            </if>
+            <if test="params.taocanaTypes != null">
+                and a.taocana_types = #{params.taocanaTypes}
+            </if>
+            <if test="params.taocanaMoneyStart != null ">
+                <![CDATA[  and a.taocana_money >= #{params.taocanaMoneyStart}   ]]>
+            </if>
+            <if test="params.taocanaMoneyEnd != null ">
+                <![CDATA[  and a.taocana_money <= #{params.taocanaMoneyEnd}   ]]>
+            </if>
+            <if test=" params.taocanaContent != '' and params.taocanaContent != null and params.taocanaContent != 'null' ">
+                and a.taocana_content like CONCAT('%',#{params.taocanaContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
